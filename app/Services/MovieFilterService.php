@@ -32,46 +32,14 @@ class MovieFilterService extends Service
     public function recommend(array $movies, $params)
     {
         foreach ($params as $key => $param) {
-            $method = 'by' . ucwords($key);
-            if (!is_null($param) && method_exists($this, $method)) {
-                $movies = $this->$method($movies, $param);
+            $klass = "App\\Services\\Filters\\" . ucwords($key);
+            if (!is_null($param) && class_exists($klass)) {
+                $movies = (new $klass())->filter($movies, $param);
             }
         }
 
         // if more than one recommendation, order by rating
-        if (count($movies) > 1) {
-            $movies = $this->sortByRating($movies);
-        }
-
-        return $movies;
-    }
-
-    /**
-     * filter by genre
-     *
-     * @param $movies
-     * @param $genre
-     * @return array
-     */
-    public function byGenre($movies, $genre)
-    {
-        return array_values(array_filter($movies, function ($movie) use ($genre) {
-            return in_array(strtolower($genre), array_map('strtolower', $movie['genres']));
-        }));
-    }
-
-    /**
-     * filter by time
-     *
-     * @param $movies
-     * @param $time
-     * @return array
-     */
-    public function byTime($movies, $time)
-    {
-        return array_values(array_filter($movies, function ($movie) use ($time) {
-            return !empty(DateTimeHelper::getTimesAheadOfMins($movie['showings'], DateTimeHelper::appendSecondAndTZ($time), $this->gapOfMins));
-        }));
+        return $this->sortByRating($movies);
     }
 
     /**

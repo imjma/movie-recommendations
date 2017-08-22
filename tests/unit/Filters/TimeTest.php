@@ -1,26 +1,25 @@
 <?php
 
-use App\Services\MovieFilterService;
+use App\Services\Filters\Time;
 
-class MovieFilterServiceTest extends TestCase
+class TimeTest extends TestCase
 {
     /**
-     * @dataProvider recommendProvider
+     * @dataProvider filterProvider
      */
-    public function testRecommend($filter, $movies, $params, $expected)
+    public function testFilter($filter, $movies, $time, $expected)
     {
-        $this->assertEquals($expected, $filter->recommend($movies, $params));
+        $this->assertEquals($expected, $filter->filter($movies, $time));
     }
 
-    public function recommendProvider()
+    public function filterProvider()
     {
-        $filter = new MovieFilterService();
+        $filter = new Time();
         $movies = $this->data();
         return [
-            [$filter, $movies, [], [$movies[0], $movies[2], $movies[1], $movies[3]]],
-            [$filter, $movies, ['genre' => 'Drama'], [$movies[0], $movies[2]]],
-            [$filter, $movies, ['time' => '19:45'], [$movies[0], $movies[2],  $movies[3]]],
-            [$filter, $movies, ['genre' => 'Drama', 'time' => '19:45'], [$movies[0], $movies[2]]],
+            [$filter, $movies, '18:45', [$movies[1], $movies[2]]],
+            [$filter, $movies, '19:00', [$movies[1], $movies[2], $movies[3]]],
+            [$filter, $movies, '22:00', []],
         ];
     }
 
@@ -40,7 +39,7 @@ class MovieFilterServiceTest extends TestCase
             ],
             1 => [
                 'name'=> 'Test 2',
-                'rating' => 75,
+                'rating' => 50,
                 'genres' => [
                     'Comedy'
                 ],
@@ -62,7 +61,7 @@ class MovieFilterServiceTest extends TestCase
             ],
             3 => [
                 'name'=> 'Test 4',
-                'rating' => 70,
+                'rating' => 90,
                 'genres' => [
                     'comedy', 'Animation'
                 ],
