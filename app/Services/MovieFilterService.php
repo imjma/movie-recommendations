@@ -69,11 +69,9 @@ class MovieFilterService extends Service
      */
     public function byTime($movies, $time)
     {
-        $d = array_values(array_filter($movies, function ($movie) use ($time) {
+        return array_values(array_filter($movies, function ($movie) use ($time) {
             return !empty(DateTimeHelper::getTimesAheadOfMins($movie['showings'], DateTimeHelper::appendSecondAndTZ($time), $this->gapOfMins));
         }));
-
-        return $d;
     }
 
     /**
@@ -85,11 +83,11 @@ class MovieFilterService extends Service
     public function sortByRating($movies)
     {
         // only sort with more than one movies
-        if (count($movies) <= 1) return $movies;
-
-        usort($movies, function ($m1, $m2) {
-            return $m1['rating'] < $m2['rating'];
-        });
+        if (count($movies) > 1) {
+            usort($movies, function ($m1, $m2) {
+                return $m1['rating'] < $m2['rating'];
+            });
+        }
 
         return $movies;
     }
